@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Halde GT | Build yours</title>
+    <meta name="description" content="Configure the Halde GT electric grand tourer in real-time 3D. Choose paint, wheels, calipers and cabin." />
+    <meta name="theme-color" content="#f2f3f4" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0e0f11" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" href="/halde-configurator/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/halde-configurator/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/halde-configurator/apple-touch-icon.png" />
+    <link rel="preload" href="/halde-configurator/models/car.glb" as="fetch" crossorigin />
+    <script>
+      try {
+        const t = localStorage.getItem('halde-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) {}
+    </script>
+    <script type="module" crossorigin src="/halde-configurator/assets/index-yMFJ38bd.js"></script>
+    <link rel="stylesheet" crossorigin href="/halde-configurator/assets/index-tolz0_Zy.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#configure">Skip to configurator</a>
+
+    <header class="nav" id="top">
+      <a class="brand" href="#top" aria-label="Halde home">
+        <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true">
+          <path d="M10 8h10v48H10z" fill="currentColor" />
+          <path d="M44 8h10v48H44z" fill="currentColor" />
+          <path d="M20 39.5 44 27v10.5L20 50z" fill="var(--accent)" />
+        </svg>
+        <span class="brand-word">HALDE</span>
+      </a>
+
+      <nav class="nav-links" aria-label="Primary">
+        <a href="#configure">Configure</a>
+        <a href="#range">Range</a>
+        <a href="#interior">Interior</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="icon-btn" id="theme-toggle" type="button" aria-label="Toggle colour theme">
+          <i class="ph ph-moon" aria-hidden="true"></i>
+        </button>
+        <a class="btn btn-primary btn-sm nav-cta" href="#reserve">Reserve</a>
+        <button class="icon-btn menu-btn" id="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+          <i class="ph ph-list" aria-hidden="true"></i>
+        </button>
+      </div>
+    </header>
+
+    <div class="mobile-menu" id="mobile-menu" hidden>
+      <a href="#configure">Configure</a>
+      <a href="#range">Range</a>
+      <a href="#interior">Interior</a>
+      <a href="#reserve" class="btn btn-primary">Reserve</a>
+    </div>
+
+    <main>
+      <!-- Configurator -->
+      <section class="configurator" id="configure" aria-labelledby="config-title">
+        <div class="stage" id="stage">
+          <canvas id="car-canvas" aria-label="Interactive 3D model of the Halde GT. Drag to rotate, pinch or scroll to zoom." role="img"></canvas>
+
+          <div class="stage-copy">
+            <h1 id="config-title">Halde GT</h1>
+            <p>An electric grand tourer. Pick the paint, wheels and cabin, then turn it around.</p>
+          </div>
+
+          <div class="stage-loader" id="stage-loader" role="status" aria-live="polite">
+            <div class="loader-bar"><span id="loader-fill"></span></div>
+            <p id="loader-text">Loading model</p>
+          </div>
+
+          <div class="stage-error" id="stage-error" hidden>
+            <i class="ph ph-warning-circle" aria-hidden="true"></i>
+            <p>The 3D model could not load. Check your connection and try again.</p>
+            <button class="btn btn-ghost btn-sm" type="button" id="retry-load">Try again</button>
+          </div>
+
+          <div class="stage-controls">
+            <div class="segmented" role="group" aria-label="Camera view">
+              <button type="button" data-view="front">Front</button>
+              <button type="button" data-view="three" class="is-active">3/4</button>
+              <button type="button" data-view="side">Side</button>
+              <button type="button" data-view="rear">Rear</button>
+              <button type="button" data-view="top">Top</button>
+            </div>
+            <button class="icon-btn icon-btn-solid" id="spin-toggle" type="button" aria-pressed="false" aria-label="Auto rotate">
+              <i class="ph ph-arrows-clockwise" aria-hidden="true"></i>
+            </button>
+          </div>
+          <p class="stage-hint"><i class="ph ph-hand-grabbing" aria-hidden="true"></i> Drag to rotate</p>
+        </div>
+
+        <aside class="panel" aria-label="Build options">
+          <div class="panel-scroll">
+            <fieldset class="opt-group">
+              <legend>Version</legend>
+              <div class="trim-list" id="trim-list"></div>
+            </fieldset>
+
+            <fieldset class="opt-group">
+              <legend>Paint <span class="opt-value" id="paint-name"></span></legend>
+              <div class="swatches" id="paint-list"></div>
+              <div class="segmented segmented-full" role="group" aria-label="Paint finish" id="finish-list">
+                <button type="button" data-finish="gloss" class="is-active">Gloss</button>
+                <button type="button" data-finish="satin">Satin</button>
+              </div>
+            </fieldset>
+
+            <fieldset class="opt-group">
+              <legend>Wheels <span class="opt-value" id="wheel-name"></span></legend>
+              <div class="swatches" id="wheel-list"></div>
+            </fieldset>
+
+            <fieldset class="opt-group">
+              <legend>Brake calipers <span class="opt-value" id="caliper-name"></span></legend>
+              <div class="swatches" id="caliper-list"></div>
+            </fieldset>
+
+            <fieldset class="opt-group">
+              <legend>Cabin <span class="opt-value" id="cabin-name"></span></legend>
+              <div class="swatches" id="cabin-list"></div>
+            </fieldset>
+          </div>
+
+          <div class="panel-foot">
+            <div>
+              <p class="foot-label">Your Halde GT</p>
+              <p class="foot-price" id="total-price" aria-live="polite"></p>
+            </div>
+            <a class="btn btn-primary" href="#reserve">Reserve</a>
+          </div>
+        </aside>
+      </section>
+
+      <!-- Range -->
+      <section class="range" id="range" aria-labelledby="range-title">
+        <img src="/halde-configurator/images/valley-road.jpg" alt="A road winding through a mountain valley at dusk" class="range-img" loading="lazy" width="2000" height="3000" />
+        <div class="range-scrim" aria-hidden="true"></div>
+        <div class="range-content container">
+          <h2 id="range-title" class="reveal">Built for the long way round.</h2>
+          <p class="reveal">A 102 kWh battery, two motors and a drag coefficient of 0.23. Enough to cross a mountain range without planning your day around a charger.</p>
+          <dl class="metrics reveal">
+            <div><dt>Range (WLTP)</dt><dd id="metric-range">610<span>km</span></dd></div>
+            <div><dt>0 to 100 km/h</dt><dd id="metric-accel">4.1<span>s</span></dd></div>
+            <div><dt>10 to 80% charge</dt><dd>18<span>min</span></dd></div>
+          </dl>
+        </div>
+      </section>
+
+      <!-- Interior -->
+      <section class="interior container" id="interior" aria-labelledby="interior-title">
+        <div class="bento">
+          <figure class="cell cell-seats reveal">
+            <img src="/halde-configurator/images/tan-seats.jpg" alt="Tan perforated leather front seats seen through an open window" loading="lazy" width="2000" height="1333" />
+          </figure>
+          <div class="cell cell-text reveal">
+            <h2 id="interior-title">A cabin you want to sit in.</h2>
+            <p>Hand-stitched leather or a wool blend, open-pore walnut, and seats that stay comfortable after six hours at the wheel.</p>
+            <a class="link-arrow" href="#configure" data-cabin-jump>Choose your cabin <i class="ph ph-arrow-up-right" aria-hidden="true"></i></a>
+          </div>
+          <figure class="cell cell-headrest reveal">
+            <img src="/halde-configurator/images/headrest.jpg" alt="Close-up of a black quilted leather headrest with a walnut stem" loading="lazy" width="2000" height="3000" />
+          </figure>
+          <figure class="cell cell-road reveal">
+            <img src="/halde-configurator/images/mountain-road.jpg" alt="An empty mountain road curving between steep rocky slopes" loading="lazy" width="2000" height="2500" />
+            <figcaption>Quiet at speed: 64 dB at 120 km/h, with laminated glass all round.</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <!-- Reserve -->
+      <section class="reserve container" id="reserve" aria-labelledby="reserve-title">
+        <div class="reserve-grid">
+          <div class="summary reveal">
+            <h2 id="reserve-title">Reserve your build.</h2>
+            <p class="summary-lead">A refundable deposit of €2,500 holds your place. We will contact you before production to confirm every detail.</p>
+            <ul class="summary-list" id="summary-list"></ul>
+            <div class="summary-total">
+              <span>Estimated total</span>
+              <strong id="summary-total"></strong>
+            </div>
+          </div>
+
+          <form class="reserve-form reveal" id="reserve-form" novalidate>
+            <div class="field">
+              <label for="f-name">Full name</label>
+              <input id="f-name" name="name" type="text" autocomplete="name" required />
+              <p class="field-error" id="f-name-error"></p>
+            </div>
+            <div class="field">
+              <label for="f-email">Email</label>
+              <input id="f-email" name="email" type="email" autocomplete="email" required />
+              <p class="field-error" id="f-email-error"></p>
+            </div>
+            <div class="field">
+              <label for="f-country">Delivery country</label>
+              <select id="f-country" name="country" autocomplete="country-name" required>
+                <option value="">Select a country</option>
+                <option>Austria</option>
+                <option>Belgium</option>
+                <option>Denmark</option>
+                <option>France</option>
+                <option>Germany</option>
+                <option>Netherlands</option>
+                <option>Norway</option>
+                <option>Sweden</option>
+                <option>Switzerland</option>
+                <option>United Kingdom</option>
+              </select>
+              <p class="field-error" id="f-country-error"></p>
+            </div>
+            <label class="check">
+              <input type="checkbox" name="updates" />
+              <span>Send me build updates by email</span>
+            </label>
+            <button class="btn btn-primary btn-block" type="submit" id="submit-btn">
+              <span class="btn-label">Place reservation</span>
+            </button>
+            <p class="form-note">No payment is taken on this demo site.</p>
+
+            <div class="form-success" id="form-success" hidden tabindex="-1">
+              <i class="ph ph-check-circle" aria-hidden="true"></i>
+              <h3>Reservation received</h3>
+              <p id="success-text"></p>
+            </div>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer-inner">
+        <a class="brand" href="#top" aria-label="Back to top">
+          <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true">
+            <path d="M10 8h10v48H10z" fill="currentColor" />
+            <path d="M44 8h10v48H44z" fill="currentColor" />
+            <path d="M20 39.5 44 27v10.5L20 50z" fill="var(--accent)" />
+          </svg>
+          <span class="brand-word">HALDE</span>
+        </a>
+        <p class="footer-note">
+          Halde is a fictional brand made for a portfolio project. Prices and figures are illustrative.
+          3D model: <a href="https://sketchfab.com/models/57bf6cc56931426e87494f554df1dab6" target="_blank" rel="noopener">vicent091036</a> via the three.js examples, rebadged.
+          Photography from <a href="https://unsplash.com" target="_blank" rel="noopener">Unsplash</a>.
+        </p>
+        <p class="footer-copy">© 2026 Halde</p>
+      </div>
+    </footer>
+
+  </body>
+</html>
