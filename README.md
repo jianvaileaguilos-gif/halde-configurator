@@ -9,7 +9,10 @@ npm install
 npm run dev       # http://localhost:5173
 npm run build     # production build in dist/
 npm run preview   # serve the production build
+npm run deploy    # build and publish to GitHub Pages (gh-pages branch)
 ```
+
+Live site: https://jianvaileaguilos-gif.github.io/halde-configurator/
 
 The 3D model is loaded with `fetch`, so open the site through the dev or preview server, not by double-clicking `index.html`.
 
